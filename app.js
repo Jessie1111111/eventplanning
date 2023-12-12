@@ -1,48 +1,34 @@
 const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-
 const app = express();
 
-app.use(bodyParser.json());
-app.use(cors());
+app.use(express.json()); // 用于解析 JSON 请求体
 
-const events = []; 
-const port = process.env.PORT || 5000;
-app.listen(port, () => console.log(`Server running on port ${port}`));
+// 示例数据存储
+let events = [];
 
 app.get('/events', (req, res) => {
     res.json(events);
 });
 
-
 app.post('/events', (req, res) => {
     const event = req.body;
+    event.id = events.length + 1; // 简单的 ID 分配
     events.push(event);
-    res.send('Event added successfully');
+    res.status(201).send(`Event added with ID: ${event.id}`);
 });
 
-
 app.put('/events/:id', (req, res) => {
-    const id = req.params.id;
-    const updatedEvent = req.body;
+    const id = parseInt(req.params.id);
     const index = events.findIndex(e => e.id === id);
-    if (index !== -1) {
-        events[index] = updatedEvent;
+    if (index >= 0) {
+        events[index] = {...events[index], ...req.body};
         res.send('Event updated successfully');
     } else {
         res.status(404).send('Event not found');
     }
 });
 
-
 app.delete('/events/:id', (req, res) => {
-    const id = req.params.id;
-    const index = events.findIndex(e => e.id === id);
-    if (index !== -1) {
-        events.splice(index, 1);
-        res.send('Event deleted successfully');
-    } else {
-        res.status(404).send('Event not found');
-    }
-});
+    const id = parseInt(req.params.id);
+    events = events.filter(e => e.id !== id);
+   
