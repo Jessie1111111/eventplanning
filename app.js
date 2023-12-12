@@ -1,53 +1,41 @@
-document.getElementById('eventInput').addEventListener('keypress', function (e) {
-    if (e.key === 'Enter') {
-        addEvent();
-    }
+import express from 'express';
+import { fileURLToPath } from 'url';
+import path from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+const events = [];
+
+app.use(express.json());
+
+app.use(express.static(path.join(__dirname, './public'),{index:"index.html"}));
+
+app.get('/all-event', (req, res) => {
+    res.json(events);
 });
 
-function addEvent() {
-    var input = document.getElementById("eventInput");
-    var newEvent = input.value;
-    if (newEvent) {
-        var li = document.createElement("li");
-        var textSpan = document.createElement("span");
-        textSpan.textContent = newEvent;
-        li.appendChild(textSpan);
+app.post('/create-event', (req, res) => {
+    const createEvent = req.body.event;
+    events.push(createEvent);
+    res.json(createEvent);
+});
 
-        var editBtn = document.createElement("button");
-        editBtn.textContent = "Edit";
-        editBtn.onclick = function() { editEvent(textSpan, this); };
-        li.appendChild(editBtn);
+app.post('/update-event', (req, res) => {
+    const {event,index} = req.body;
+    events[index] = event;
+    res.json(event);
+});
 
-        var deleteBtn = document.createElement("button");
-        deleteBtn.textContent = "Delete";
-        deleteBtn.onclick = function() { this.parentNode.remove(); };
-        li.appendChild(deleteBtn);
+app.post('/delete-event', (req, res) => {
+    const {index} = req.body;
+    events.splice(index, 1);
+    res.json({ message: 'Event deleted successfully' });
+});
 
-        document.getElementById("eventList").appendChild(li);
-        input.value = ""; // Clear the input
-    }
-}
-
-function editEvent(textSpan, editBtn) {
-    var currentText = textSpan.textContent;
-    var input = document.createElement("input");
-    input.type = "text";
-    input.value = currentText;
-    textSpan.parentNode.insertBefore(input, textSpan);
-    textSpan.parentNode.removeChild(textSpan);
-    
-    editBtn.textContent = "Save";
-    editBtn.onclick = function() { saveEvent(input, this); };
-}
-
-function saveEvent(input, editBtn) {
-    var newEvent = input.value;
-    var textSpan = document.createElement("span");
-    textSpan.textContent = newEvent;
-
-    input.parentNode.insertBefore(textSpan, input);
-    input.parentNode.removeChild(input);
-
-    editBtn.textContent = "Edit";
-    editBtn.onclick = function() { editEvent(textSpan, this); };
-}
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
