@@ -1,18 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-
+    <title>Event Planner</title>
 </head>
-<!-- <link rel="stylesheet" type="" href="style.css" /> -->
-
-<div>
-    <p>API</p>
-    
-</div>
 <body>
-<script src="./app.js"></script>
+    <h1>Event Planner</h1>
+    <input type="text" id="eventInput" placeholder="Add new event">
+    <button onclick="addEvent()">Add Event</button>
+    <button onclick="sortEvents()">Sort Events</button>
+    <ul id="eventList"></ul>
+
+    <script src="./app.js"></script>
 </body>
 </html>

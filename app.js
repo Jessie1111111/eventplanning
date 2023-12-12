@@ -1,34 +1,53 @@
-const express = require('express');
-const app = express();
-
-app.use(express.json()); // 用于解析 JSON 请求体
-
-// 示例数据存储
-let events = [];
-
-app.get('/events', (req, res) => {
-    res.json(events);
-});
-
-app.post('/events', (req, res) => {
-    const event = req.body;
-    event.id = events.length + 1; // 简单的 ID 分配
-    events.push(event);
-    res.status(201).send(`Event added with ID: ${event.id}`);
-});
-
-app.put('/events/:id', (req, res) => {
-    const id = parseInt(req.params.id);
-    const index = events.findIndex(e => e.id === id);
-    if (index >= 0) {
-        events[index] = {...events[index], ...req.body};
-        res.send('Event updated successfully');
-    } else {
-        res.status(404).send('Event not found');
+document.getElementById('eventInput').addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') {
+        addEvent();
     }
 });
 
-app.delete('/events/:id', (req, res) => {
-    const id = parseInt(req.params.id);
-    events = events.filter(e => e.id !== id);
-   
+function addEvent() {
+    var input = document.getElementById("eventInput");
+    var newEvent = input.value;
+    if (newEvent) {
+        var li = document.createElement("li");
+        var textSpan = document.createElement("span");
+        textSpan.textContent = newEvent;
+        li.appendChild(textSpan);
+
+        var editBtn = document.createElement("button");
+        editBtn.textContent = "Edit";
+        editBtn.onclick = function() { editEvent(textSpan, this); };
+        li.appendChild(editBtn);
+
+        var deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "Delete";
+        deleteBtn.onclick = function() { this.parentNode.remove(); };
+        li.appendChild(deleteBtn);
+
+        document.getElementById("eventList").appendChild(li);
+        input.value = ""; // Clear the input
+    }
+}
+
+function editEvent(textSpan, editBtn) {
+    var currentText = textSpan.textContent;
+    var input = document.createElement("input");
+    input.type = "text";
+    input.value = currentText;
+    textSpan.parentNode.insertBefore(input, textSpan);
+    textSpan.parentNode.removeChild(textSpan);
+    
+    editBtn.textContent = "Save";
+    editBtn.onclick = function() { saveEvent(input, this); };
+}
+
+function saveEvent(input, editBtn) {
+    var newEvent = input.value;
+    var textSpan = document.createElement("span");
+    textSpan.textContent = newEvent;
+
+    input.parentNode.insertBefore(textSpan, input);
+    input.parentNode.removeChild(input);
+
+    editBtn.textContent = "Edit";
+    editBtn.onclick = function() { editEvent(textSpan, this); };
+}
